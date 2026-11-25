@@ -1,0 +1,284 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Inherit custom typography into all form controls */
+  input,
+  textarea,
+  select,
+  button,
+  optgroup,
+  option {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+  }
+
+  input,
+  textarea,
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: rgba(5, 16, 21, 0.85);
+    backdrop-filter: blur(12px);
+    color: #F0FDF9;
+    border-color: rgba(0, 245, 184, 0.18);
+    border-radius: 0.5rem;
+  }
+
+  .dark input,
+  .dark textarea,
+  .dark select {
+    background-color: rgba(5, 16, 21, 0.85);
+    color: #F0FDF9;
+    border-color: rgba(0, 245, 184, 0.18);
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  /* Smooth scroll & antialiasing */
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #03070A;
+    color: #F0FDF9;
+  }
+
+  body {
+    background-color: #03070A;
+    color: #F0FDF9;
+    font-family: 'Figtree', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Figtree', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+  }
+
+  /* Chrome/Safari Autofill Override for dark theme */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-text-fill-color: #F0FDF9 !important;
+    -webkit-box-shadow: 0 0 0 1000px #06151B inset !important;
+    box-shadow: 0 0 0 1000px #06151B inset !important;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #F0FDF9 !important;
+    -webkit-box-shadow: 0 0 0 1000px #06151B inset !important;
+    box-shadow: 0 0 0 1000px #06151B inset !important;
+  }
+
+  /* Custom Select SVG Chevron Dropdown Indicator */
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2300F5B8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-position: right 14px center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    padding-right: 40px !important;
+  }
+
+  .dark select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2300F5B8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  }
+
+  /* Accessible Placeholders */
+  ::placeholder {
+    color: #5A7E88 !important;
+    opacity: 1 !important;
+  }
+  .dark ::placeholder {
+    color: #5A7E88 !important;
+    opacity: 1 !important;
+  }
+
+  /* Selection Color (Cosmic Emerald Glow) */
+  ::selection {
+    background-color: rgba(0, 245, 184, 0.28);
+    color: #00F5B8;
+  }
+
+  /* Focus ring utility with Radiant Emerald Glow */
+  :focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 2px #03070A, 0 0 0 4px #00F5B8, 0 0 20px rgba(0, 245, 184, 0.3) !important;
+  }
+  .dark :focus-visible {
+    box-shadow: 0 0 0 2px #03070A, 0 0 0 4px #00F5B8, 0 0 20px rgba(0, 245, 184, 0.3) !important;
+  }
+}
+
+/* Subtle ambient background glow in Cosmic Emerald */
+.page-ambient-bg {
+  position: relative;
+  background-color: transparent;
+}
+.page-ambient-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  max-width: 100vw;
+  height: 480px;
+  background: radial-gradient(circle at 50% 0%, rgba(0, 245, 184, 0.12) 0%, rgba(3, 7, 10, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.dark .page-ambient-bg::before {
+  background: radial-gradient(circle at 50% 0%, rgba(0, 245, 184, 0.12) 0%, rgba(3, 7, 10, 0) 70%);
+}
+
+/* Primary Button Styling — Cosmic Aurora Emerald (#00F5B8 -> #00C49F) */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 20px;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #00F5B8 0%, #00C49F 100%);
+  color: #021713;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(0, 245, 184, 0.6);
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 20px rgba(0, 245, 184, 0.35);
+}
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #38FFC8 0%, #00E5B3 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 0 28px rgba(0, 245, 184, 0.5);
+}
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+  background: #00C49F;
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Secondary Button Styling — Cosmic Frosted Glass */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 18px;
+  border-radius: 0.5rem;
+  background-color: rgba(10, 25, 31, 0.75);
+  backdrop-filter: blur(8px);
+  color: #E2F9F3;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(0, 245, 184, 0.22);
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dark .btn-secondary {
+  background-color: rgba(10, 25, 31, 0.75);
+  color: #E2F9F3;
+  border-color: rgba(0, 245, 184, 0.22);
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: rgba(14, 34, 42, 0.9);
+  border-color: #00F5B8;
+  color: #00F5B8;
+  transform: translateY(-1px);
+  box-shadow: 0 0 16px rgba(0, 245, 184, 0.22);
+}
+.dark .btn-secondary:hover:not(:disabled) {
+  background-color: rgba(14, 34, 42, 0.9);
+  border-color: #00F5B8;
+  color: #00F5B8;
+  box-shadow: 0 0 16px rgba(0, 245, 184, 0.22);
+}
+.btn-secondary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Accessible Input styling */
+.form-input {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 245, 184, 0.18);
+  background-color: rgba(5, 16, 21, 0.85);
+  backdrop-filter: blur(12px);
+  color: #F0FDF9;
+  font-size: 14px;
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+.dark .form-input {
+  border-color: rgba(0, 245, 184, 0.18);
+  background-color: rgba(5, 16, 21, 0.85);
+  color: #F0FDF9;
+}
+.form-input:hover:not(:disabled) {
+  border-color: rgba(0, 245, 184, 0.35);
+}
+.dark .form-input:hover:not(:disabled) {
+  border-color: rgba(0, 245, 184, 0.35);
+}
+.form-input:focus {
+  outline: none;
+  border-color: #00F5B8;
+  box-shadow: 0 0 0 2px #03070A, 0 0 0 4px rgba(0, 245, 184, 0.4), 0 0 16px rgba(0, 245, 184, 0.25);
+}
+.dark .form-input:focus {
+  border-color: #00F5B8;
+  box-shadow: 0 0 0 2px #03070A, 0 0 0 4px rgba(0, 245, 184, 0.4), 0 0 16px rgba(0, 245, 184, 0.25);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #03070A;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 245, 184, 0.25);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00F5B8;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    transform: none !important;
+  }
+}
