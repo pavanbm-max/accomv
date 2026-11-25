@@ -1,7 +1,3 @@
-# Assistant & Skills
-.agents/
-skills-lock.json
-
 # Dependencies
 node_modules/
 .pnp
@@ -39,3 +35,7 @@ Thumbs.db
 # Supabase local dev
 supabase/.branches/
 supabase/.temp/
+
+# Antigravity agent files
+.agents/
+skills-lock.json

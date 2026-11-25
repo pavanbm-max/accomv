@@ -19,9 +19,7 @@ import {
   AlertCircle,
   CheckCircle2,
   XCircle,
-  Coffee,
-  Sun,
-  Moon
+  Coffee
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -176,43 +174,32 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <Utensils className="w-4 h-4 text-[#00F5B8]" />
               <h3 className="text-sm font-bold text-[#F0FDF9] uppercase tracking-wider">
-                Kitchen Meal Demands
+                Meal Demand Breakdown
               </h3>
             </div>
-            <span className="text-xs px-2.5 py-1 rounded bg-[#00F5B8]/10 text-[#00F5B8] border border-[#00F5B8]/30 font-semibold font-mono">
-              Total: {(stats?.breakfast_demand || 0) + (stats?.lunch_demand || 0) + (stats?.dinner_demand || 0)} plates
-            </span>
+            <span className="text-xs text-[#9FB9C1]">Kitchen procurement counts</span>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            <div className="p-3.5 rounded-lg bg-[#040E12] border border-amber-500/25 text-center">
-              <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-amber-300 uppercase">
-                <Coffee className="w-3.5 h-3.5 text-amber-400" />
-                <span>Breakfast</span>
-              </div>
-              <div className="text-xl sm:text-2xl font-bold text-amber-400 mt-1 font-mono">
+            <div className="p-3.5 rounded-lg bg-[#040E12] border border-[#00F5B8]/15 text-center">
+              <div className="text-[11px] font-semibold text-[#9FB9C1] uppercase">Breakfast</div>
+              <div className="text-xl sm:text-2xl font-bold text-[#00F5B8] mt-1 font-mono">
                 {loading || !stats ? <Skeleton className="h-6 w-12 mx-auto bg-[#0B1E26]" /> : stats.breakfast_demand}
               </div>
               <div className="text-[10px] text-[#5A7E88] mt-0.5">@ ₹50 / meal</div>
             </div>
 
-            <div className="p-3.5 rounded-lg bg-[#040E12] border border-sky-500/25 text-center">
-              <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-sky-300 uppercase">
-                <Sun className="w-3.5 h-3.5 text-sky-400" />
-                <span>Lunch</span>
-              </div>
-              <div className="text-xl sm:text-2xl font-bold text-sky-400 mt-1 font-mono">
+            <div className="p-3.5 rounded-lg bg-[#040E12] border border-[#00F5B8]/15 text-center">
+              <div className="text-[11px] font-semibold text-[#9FB9C1] uppercase">Lunch</div>
+              <div className="text-xl sm:text-2xl font-bold text-[#00F5B8] mt-1 font-mono">
                 {loading || !stats ? <Skeleton className="h-6 w-12 mx-auto bg-[#0B1E26]" /> : stats.lunch_demand}
               </div>
               <div className="text-[10px] text-[#5A7E88] mt-0.5">@ ₹60 / meal</div>
             </div>
 
-            <div className="p-3.5 rounded-lg bg-[#040E12] border border-purple-500/25 text-center">
-              <div className="flex items-center justify-center gap-1 text-[11px] font-semibold text-purple-300 uppercase">
-                <Moon className="w-3.5 h-3.5 text-purple-400" />
-                <span>Dinner</span>
-              </div>
-              <div className="text-xl sm:text-2xl font-bold text-purple-400 mt-1 font-mono">
+            <div className="p-3.5 rounded-lg bg-[#040E12] border border-[#00F5B8]/15 text-center">
+              <div className="text-[11px] font-semibold text-[#9FB9C1] uppercase">Dinner</div>
+              <div className="text-xl sm:text-2xl font-bold text-[#00F5B8] mt-1 font-mono">
                 {loading || !stats ? <Skeleton className="h-6 w-12 mx-auto bg-[#0B1E26]" /> : stats.dinner_demand}
               </div>
               <div className="text-[10px] text-[#5A7E88] mt-0.5">@ ₹60 / meal</div>
@@ -388,38 +375,9 @@ export const AdminDashboardPage: React.FC = () => {
                       )}
                     </td>
                     <td className="py-3 px-3 text-[#9FB9C1]">
-                      {(!reg.meal_requirements || (
-                        (reg.meal_requirements.breakfast_quantity || 0) === 0 &&
-                        (reg.meal_requirements.lunch_quantity || 0) === 0 &&
-                        (reg.meal_requirements.dinner_quantity || 0) === 0
-                      )) ? (
-                        <span className="text-[#5A7E88] italic text-[11px]">No meals</span>
-                      ) : (
-                        <div className="space-y-0.5">
-                          <div className="flex flex-wrap gap-1 font-mono text-[10px]">
-                            {(reg.meal_requirements.breakfast_quantity || 0) > 0 && (
-                              <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 font-semibold border border-amber-500/25">
-                                BF: {reg.meal_requirements.breakfast_quantity}
-                              </span>
-                            )}
-                            {(reg.meal_requirements.lunch_quantity || 0) > 0 && (
-                              <span className="px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-300 font-semibold border border-sky-500/25">
-                                L: {reg.meal_requirements.lunch_quantity}
-                              </span>
-                            )}
-                            {(reg.meal_requirements.dinner_quantity || 0) > 0 && (
-                              <span className="px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 font-semibold border border-purple-500/25">
-                                D: {reg.meal_requirements.dinner_quantity}
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-[10px] text-[#00F5B8] font-mono">
-                            {(reg.meal_requirements.breakfast_quantity || 0) +
-                             (reg.meal_requirements.lunch_quantity || 0) +
-                             (reg.meal_requirements.dinner_quantity || 0)} meals total
-                          </div>
-                        </div>
-                      )}
+                      <span className="font-mono">
+                        B:{reg.meal_requirements?.breakfast_quantity || 0} L:{reg.meal_requirements?.lunch_quantity || 0} D:{reg.meal_requirements?.dinner_quantity || 0}
+                      </span>
                     </td>
                     <td className="py-3 px-3 font-mono font-semibold text-[#F0FDF9]">
                       {formatINR(reg.total_estimated_amount)}

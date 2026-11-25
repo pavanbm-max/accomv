@@ -29,10 +29,7 @@ import {
   Utensils, 
   Users,
   CheckCircle2,
-  AlertTriangle,
-  Coffee,
-  Sun,
-  Moon
+  AlertTriangle
 } from 'lucide-react';
 
 const EVENT_CATEGORIES = [
@@ -162,32 +159,6 @@ export const AdminRegistrationsPage: React.FC = () => {
     }
   };
 
-  // Kitchen Aggregate Demands across loaded/filtered registrations
-  const mealSummary = registrations.reduce(
-    (acc, r) => {
-      const b = r.meal_requirements?.breakfast_quantity || 0;
-      const l = r.meal_requirements?.lunch_quantity || 0;
-      const d = r.meal_requirements?.dinner_quantity || 0;
-      acc.totalBreakfast += b;
-      acc.totalLunch += l;
-      acc.totalDinner += d;
-      acc.totalMeals += b + l + d;
-      acc.totalMealCharges += r.meal_estimated_amount || 0;
-      if (b > 0 || l > 0 || d > 0) {
-        acc.registrationsWithMeals += 1;
-      }
-      return acc;
-    },
-    {
-      totalBreakfast: 0,
-      totalLunch: 0,
-      totalDinner: 0,
-      totalMeals: 0,
-      totalMealCharges: 0,
-      registrationsWithMeals: 0,
-    }
-  );
-
   // CSV Export (Section 8)
   const handleExportCSV = () => {
     if (registrations.length === 0) {
@@ -214,15 +185,12 @@ export const AdminRegistrationsPage: React.FC = () => {
       'Check-out Date',
       'Accommodation Estimated Amount (INR)',
       'Breakfast Meals Count',
-      'Breakfast Rate (INR)',
-      'Breakfast Subtotal (INR)',
+      'Breakfast Amount (INR)',
       'Lunch Meals Count',
-      'Lunch Rate (INR)',
-      'Lunch Subtotal (INR)',
+      'Lunch Amount (INR)',
       'Dinner Meals Count',
-      'Dinner Rate (INR)',
-      'Dinner Subtotal (INR)',
-      'Total Meals Demanded Count',
+      'Dinner Amount (INR)',
+      'Total Meals Count',
       'Total Meal Estimated Amount (INR)',
       'Total Estimated Amount (INR)',
       'Coordinator Follow-up Status',
@@ -233,7 +201,7 @@ export const AdminRegistrationsPage: React.FC = () => {
       const bQty = r.meal_requirements?.breakfast_quantity || 0;
       const lQty = r.meal_requirements?.lunch_quantity || 0;
       const dQty = r.meal_requirements?.dinner_quantity || 0;
-      const totalMealQty = bQty + lQty + dQty;
+      const totalMeals = bQty + lQty + dQty;
 
       return [
         r.reference_id,
@@ -254,15 +222,12 @@ export const AdminRegistrationsPage: React.FC = () => {
         r.check_out_date || '',
         r.accommodation_estimated_amount || 0,
         bQty,
-        50,
         r.meal_requirements?.breakfast_amount || 0,
         lQty,
-        60,
         r.meal_requirements?.lunch_amount || 0,
         dQty,
-        60,
         r.meal_requirements?.dinner_amount || 0,
-        totalMealQty,
+        totalMeals,
         r.meal_estimated_amount || 0,
         r.total_estimated_amount || 0,
         `"${r.admin_followup?.followup_status || 'Pending Contact'}"`,
@@ -408,107 +373,6 @@ export const AdminRegistrationsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* KITCHEN MEAL DEMAND SUMMARY BAR */}
-      <div className="p-4 rounded-xl bg-[#061419]/90 border border-[#00F5B8]/25 shadow-lg space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#00F5B8]/15">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#00F5B8]/15 text-[#00F5B8] flex items-center justify-center">
-              <Utensils className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-xs sm:text-sm font-bold text-[#F0FDF9] uppercase tracking-wider">
-                Kitchen Procurement &amp; Meal Demands (Current View)
-              </h3>
-              <p className="text-[11px] text-[#9FB9C1]">
-                Real-time cumulative meal quantities for catering, food prep, and vendor orders.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 text-xs">
-            <span className="px-2.5 py-1 rounded bg-[#00F5B8]/10 text-[#00F5B8] border border-[#00F5B8]/30 font-semibold font-mono">
-              Total: {mealSummary.totalMeals} meals demanded
-            </span>
-            <span className="px-2.5 py-1 rounded bg-[#040E12] text-[#9FB9C1] border border-[#00F5B8]/15 font-mono">
-              Value: {formatINR(mealSummary.totalMealCharges)}
-            </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          {/* Breakfast */}
-          <div className="p-3 rounded-lg bg-[#040E12] border border-amber-500/25 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-md bg-amber-500/15 text-amber-400 flex items-center justify-center">
-                <Coffee className="w-3.5 h-3.5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-semibold text-amber-300">Breakfast</div>
-                <div className="text-[10px] text-[#5A7E88]">@ ₹50 / meal</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-lg font-bold font-mono text-amber-400">{mealSummary.totalBreakfast}</div>
-              <div className="text-[10px] text-[#5A7E88]">{formatINR(mealSummary.totalBreakfast * 50)}</div>
-            </div>
-          </div>
-
-          {/* Lunch */}
-          <div className="p-3 rounded-lg bg-[#040E12] border border-sky-500/25 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-md bg-sky-500/15 text-sky-400 flex items-center justify-center">
-                <Sun className="w-3.5 h-3.5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-semibold text-sky-300">Lunch</div>
-                <div className="text-[10px] text-[#5A7E88]">@ ₹60 / meal</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-lg font-bold font-mono text-sky-400">{mealSummary.totalLunch}</div>
-              <div className="text-[10px] text-[#5A7E88]">{formatINR(mealSummary.totalLunch * 60)}</div>
-            </div>
-          </div>
-
-          {/* Dinner */}
-          <div className="p-3 rounded-lg bg-[#040E12] border border-purple-500/25 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-md bg-purple-500/15 text-purple-400 flex items-center justify-center">
-                <Moon className="w-3.5 h-3.5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-semibold text-purple-300">Dinner</div>
-                <div className="text-[10px] text-[#5A7E88]">@ ₹60 / meal</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-lg font-bold font-mono text-purple-400">{mealSummary.totalDinner}</div>
-              <div className="text-[10px] text-[#5A7E88]">{formatINR(mealSummary.totalDinner * 60)}</div>
-            </div>
-          </div>
-
-          {/* Coverage */}
-          <div className="p-3 rounded-lg bg-[#040E12] border border-[#00F5B8]/20 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-md bg-[#00F5B8]/15 text-[#00F5B8] flex items-center justify-center">
-                <Users className="w-3.5 h-3.5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-semibold text-[#00F5B8]">Meal Opt-ins</div>
-                <div className="text-[10px] text-[#5A7E88]">Participants</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-lg font-bold font-mono text-[#00F5B8]">
-                {mealSummary.registrationsWithMeals} <span className="text-xs font-normal text-[#5A7E88]">/ {registrations.length}</span>
-              </div>
-              <div className="text-[10px] text-[#5A7E88]">
-                {registrations.length > 0 ? Math.round((mealSummary.registrationsWithMeals / registrations.length) * 100) : 0}% of records
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* REGISTRATIONS DATA TABLE */}
       <div className="rounded-xl bg-[#061419]/80 backdrop-blur-xl border border-[#00F5B8]/20 shadow-[0_8px_32px_rgba(0,0,0,0.65)] overflow-hidden">
         <div className="overflow-x-auto">
@@ -594,8 +458,8 @@ export const AdminRegistrationsPage: React.FC = () => {
                         )}
                       </td>
 
-                      {/* Meals Breakdown & Explicit Counts */}
-                      <td className="py-3.5 px-3.5">
+                      {/* Meals */}
+                      <td className="py-3.5 px-3.5 text-xs">
                         {(!reg.meal_requirements || (
                           (reg.meal_requirements.breakfast_quantity || 0) === 0 &&
                           (reg.meal_requirements.lunch_quantity || 0) === 0 &&
@@ -604,34 +468,30 @@ export const AdminRegistrationsPage: React.FC = () => {
                           <span className="text-[#5A7E88] italic text-[11px]">No meals</span>
                         ) : (
                           <div className="space-y-1">
-                            <div className="flex flex-wrap gap-1">
+                            <div className="flex flex-wrap items-center gap-1">
                               {(reg.meal_requirements.breakfast_quantity || 0) > 0 && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold" title="Breakfast meals">
-                                  <Coffee className="w-3 h-3 text-amber-400" />
-                                  <span>BF: {reg.meal_requirements.breakfast_quantity}</span>
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/15 border border-amber-500/30 text-amber-300" title="Breakfast count">
+                                  <span>B:</span>
+                                  <strong>{reg.meal_requirements.breakfast_quantity}</strong>
                                 </span>
                               )}
                               {(reg.meal_requirements.lunch_quantity || 0) > 0 && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-sky-500/10 border border-sky-500/30 text-sky-300 font-mono text-[10px] font-bold" title="Lunch meals">
-                                  <Sun className="w-3 h-3 text-sky-400" />
-                                  <span>Lunch: {reg.meal_requirements.lunch_quantity}</span>
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 border border-emerald-500/30 text-emerald-300" title="Lunch count">
+                                  <span>L:</span>
+                                  <strong>{reg.meal_requirements.lunch_quantity}</strong>
                                 </span>
                               )}
                               {(reg.meal_requirements.dinner_quantity || 0) > 0 && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/30 text-purple-300 font-mono text-[10px] font-bold" title="Dinner meals">
-                                  <Moon className="w-3 h-3 text-purple-400" />
-                                  <span>Dinner: {reg.meal_requirements.dinner_quantity}</span>
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/15 border border-indigo-500/30 text-indigo-300" title="Dinner count">
+                                  <span>D:</span>
+                                  <strong>{reg.meal_requirements.dinner_quantity}</strong>
                                 </span>
                               )}
                             </div>
-                            <div className="text-[10px] text-[#5A7E88] font-mono flex items-center gap-1">
-                              <span className="font-semibold text-[#00F5B8]">
-                                {(reg.meal_requirements.breakfast_quantity || 0) +
-                                 (reg.meal_requirements.lunch_quantity || 0) +
-                                 (reg.meal_requirements.dinner_quantity || 0)} meals
-                              </span>
-                              <span>•</span>
-                              <span>{formatINR(reg.meal_estimated_amount)}</span>
+                            <div className="text-[10px] text-[#9FB9C1] font-mono">
+                              {((reg.meal_requirements.breakfast_quantity || 0) +
+                                (reg.meal_requirements.lunch_quantity || 0) +
+                                (reg.meal_requirements.dinner_quantity || 0))} meals ({formatINR(reg.meal_estimated_amount)})
                             </div>
                           </div>
                         )}
@@ -821,71 +681,68 @@ export const AdminRegistrationsPage: React.FC = () => {
               </div>
             )}
 
-            {/* Detailed Meal Requirements & Kitchen Ticket */}
+            {/* Accommodation & Meals Breakdown */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#00F5B8] flex items-center gap-1.5">
-                  <Utensils className="w-3.5 h-3.5" />
-                  <span>Kitchen Meal Requirements &amp; Itemized Counts</span>
-                </h4>
-                <span className="text-[11px] font-mono font-semibold text-[#00F5B8]">
-                  Total: {(selectedReg.meal_requirements?.breakfast_quantity || 0) +
-                          (selectedReg.meal_requirements?.lunch_quantity || 0) +
-                          (selectedReg.meal_requirements?.dinner_quantity || 0)} meals
-                </span>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#9FB9C1]">
+                Requirements &amp; Cost Estimation
+              </h4>
+
+              {/* Accommodation card */}
+              <div className="p-3.5 rounded-lg bg-[#061419]/60 border border-[#00F5B8]/15 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-[#9FB9C1] text-xs">Accommodation:</span>
+                  <span className="font-mono font-semibold text-xs text-[#F0FDF9]">
+                    {selectedReg.accommodation_required
+                      ? `${selectedReg.accommodation_participants || 1} person(s) × ${selectedReg.accommodation_days || 0} day(s) = ${formatINR(selectedReg.accommodation_estimated_amount)}`
+                      : 'None (₹0)'}
+                  </span>
+                </div>
+                {selectedReg.accommodation_required && selectedReg.check_in_date && selectedReg.check_out_date && (
+                  <div className="text-[11px] text-[#5A7E88]">
+                    Dates: {formatDate(selectedReg.check_in_date)} to {formatDate(selectedReg.check_out_date)}
+                  </div>
+                )}
               </div>
 
-              <div className="p-3.5 rounded-lg bg-[#061419]/75 border border-[#00F5B8]/20 space-y-2">
-                {/* Breakfast item */}
-                <div className="flex items-center justify-between p-2 rounded bg-[#040E12] border border-amber-500/20">
-                  <div className="flex items-center gap-2">
-                    <Coffee className="w-4 h-4 text-amber-400" />
-                    <div>
-                      <div className="font-semibold text-amber-300">Breakfast (Morning)</div>
-                      <div className="text-[10px] text-[#5A7E88]">Rate: ₹50 / meal</div>
-                    </div>
-                  </div>
-                  <div className="text-right font-mono">
-                    <div className="font-bold text-amber-400 text-sm">
-                      {selectedReg.meal_requirements?.breakfast_quantity || 0} meals
+              {/* Specific Meal Details & Counts */}
+              <div className="p-3.5 rounded-lg bg-[#061419]/60 border border-[#00F5B8]/15 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#00F5B8] flex items-center gap-1.5">
+                    <Utensils className="w-3.5 h-3.5" />
+                    <span>Meal Demands &amp; Counts</span>
+                  </span>
+                  <span className="text-[11px] text-[#9FB9C1] font-mono">
+                    Total: {((selectedReg.meal_requirements?.breakfast_quantity || 0) +
+                             (selectedReg.meal_requirements?.lunch_quantity || 0) +
+                             (selectedReg.meal_requirements?.dinner_quantity || 0))} meals
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="p-2.5 rounded-lg bg-[#040E12] border border-amber-500/25 text-center">
+                    <div className="text-[10px] font-bold uppercase text-amber-400">Breakfast</div>
+                    <div className="text-lg font-bold font-mono text-[#F0FDF9] mt-0.5">
+                      {selectedReg.meal_requirements?.breakfast_quantity || 0}
                     </div>
                     <div className="text-[10px] text-[#5A7E88]">
                       {formatINR(selectedReg.meal_requirements?.breakfast_amount || 0)}
                     </div>
                   </div>
-                </div>
 
-                {/* Lunch item */}
-                <div className="flex items-center justify-between p-2 rounded bg-[#040E12] border border-sky-500/20">
-                  <div className="flex items-center gap-2">
-                    <Sun className="w-4 h-4 text-sky-400" />
-                    <div>
-                      <div className="font-semibold text-sky-300">Lunch (Afternoon)</div>
-                      <div className="text-[10px] text-[#5A7E88]">Rate: ₹60 / meal</div>
-                    </div>
-                  </div>
-                  <div className="text-right font-mono">
-                    <div className="font-bold text-sky-400 text-sm">
-                      {selectedReg.meal_requirements?.lunch_quantity || 0} meals
+                  <div className="p-2.5 rounded-lg bg-[#040E12] border border-emerald-500/25 text-center">
+                    <div className="text-[10px] font-bold uppercase text-emerald-400">Lunch</div>
+                    <div className="text-lg font-bold font-mono text-[#F0FDF9] mt-0.5">
+                      {selectedReg.meal_requirements?.lunch_quantity || 0}
                     </div>
                     <div className="text-[10px] text-[#5A7E88]">
                       {formatINR(selectedReg.meal_requirements?.lunch_amount || 0)}
                     </div>
                   </div>
-                </div>
 
-                {/* Dinner item */}
-                <div className="flex items-center justify-between p-2 rounded bg-[#040E12] border border-purple-500/20">
-                  <div className="flex items-center gap-2">
-                    <Moon className="w-4 h-4 text-purple-400" />
-                    <div>
-                      <div className="font-semibold text-purple-300">Dinner (Night)</div>
-                      <div className="text-[10px] text-[#5A7E88]">Rate: ₹60 / meal</div>
-                    </div>
-                  </div>
-                  <div className="text-right font-mono">
-                    <div className="font-bold text-purple-400 text-sm">
-                      {selectedReg.meal_requirements?.dinner_quantity || 0} meals
+                  <div className="p-2.5 rounded-lg bg-[#040E12] border border-indigo-500/25 text-center">
+                    <div className="text-[10px] font-bold uppercase text-indigo-400">Dinner</div>
+                    <div className="text-lg font-bold font-mono text-[#F0FDF9] mt-0.5">
+                      {selectedReg.meal_requirements?.dinner_quantity || 0}
                     </div>
                     <div className="text-[10px] text-[#5A7E88]">
                       {formatINR(selectedReg.meal_requirements?.dinner_amount || 0)}
@@ -893,43 +750,20 @@ export const AdminRegistrationsPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-[#00F5B8]/15 flex justify-between items-center text-xs">
-                  <span className="font-bold text-[#F0FDF9]">Subtotal Meal Charges:</span>
-                  <span className="font-mono font-bold text-[#00F5B8]">
+                <div className="flex justify-between items-center text-xs pt-1 border-t border-[#00F5B8]/10">
+                  <span className="text-[#9FB9C1]">Total Estimated Meal Cost:</span>
+                  <span className="font-mono font-bold text-[#F0FDF9]">
                     {formatINR(selectedReg.meal_estimated_amount)}
                   </span>
                 </div>
               </div>
-            </div>
 
-            {/* Accommodation & Total Breakdown */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#9FB9C1]">
-                Accommodation &amp; Final Pipeline Breakdown
-              </h4>
-              <div className="p-3.5 rounded-lg bg-[#061419]/60 border border-[#00F5B8]/15 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-[#9FB9C1]">Hostel Accommodation:</span>
-                  <span className="font-mono font-semibold">
-                    {selectedReg.accommodation_required
-                      ? `${selectedReg.accommodation_participants || 1}p × ${selectedReg.accommodation_days || 0}d = ${formatINR(selectedReg.accommodation_estimated_amount)}`
-                      : 'None (₹0)'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#9FB9C1]">All Meals Combined:</span>
-                  <span className="font-mono font-semibold">
-                    {(selectedReg.meal_requirements?.breakfast_quantity || 0) +
-                     (selectedReg.meal_requirements?.lunch_quantity || 0) +
-                     (selectedReg.meal_requirements?.dinner_quantity || 0)} meals = {formatINR(selectedReg.meal_estimated_amount)}
-                  </span>
-                </div>
-                <div className="pt-2 border-t border-[#00F5B8]/15 flex justify-between items-center text-sm">
-                  <span className="font-bold text-[#F0FDF9]">Total Estimated Pipeline:</span>
-                  <span className="font-mono font-bold text-[#00F5B8]">
-                    {formatINR(selectedReg.total_estimated_amount)}
-                  </span>
-                </div>
+              {/* Total pipeline amount */}
+              <div className="p-3 rounded-lg bg-[#040E12] border border-[#00F5B8]/25 flex justify-between items-center">
+                <span className="font-bold text-[#F0FDF9] text-xs sm:text-sm">Total Estimated Pipeline:</span>
+                <span className="font-mono font-bold text-[#00F5B8] text-sm sm:text-base">
+                  {formatINR(selectedReg.total_estimated_amount)}
+                </span>
               </div>
             </div>
           </div>
