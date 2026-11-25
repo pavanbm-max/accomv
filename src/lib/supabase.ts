@@ -19,21 +19,23 @@ const getEnvVar = (key: string): string => {
   return '';
 };
 
-const rawUrl = getEnvVar('VITE_SUPABASE_URL') || 'https://placeholder.supabase.co';
+// Golden default credentials for project rfphosktmfdycfawxwit (Public Anon Key ONLY)
+const DEFAULT_SUPABASE_URL = 'https://rfphosktmfdycfawxwit.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmcGhvc2t0bWZkeWNmYXd4d2l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU2MTY1NTksImV4cCI6MjExMTE5MjU1OX0.7qrf_vYIYav35Q2ISZfNCu6abJTE2VSZe-6dJkjV4Ao';
+
+const rawUrl = getEnvVar('VITE_SUPABASE_URL') || DEFAULT_SUPABASE_URL;
 // Normalize URL in case user provides full REST endpoint (e.g. https://xyz.supabase.co/rest/v1/)
 const supabaseUrl = rawUrl.replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
-const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY') || 'placeholder-anon-key';
+const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY') || DEFAULT_SUPABASE_ANON_KEY;
 
 export const isSupabaseConfigured = () => {
-  const url = getEnvVar('VITE_SUPABASE_URL');
-  const key = getEnvVar('VITE_SUPABASE_ANON_KEY');
   return (
-    Boolean(url) &&
-    url !== 'https://placeholder.supabase.co' &&
-    url !== 'https://your-project.supabase.co' &&
-    Boolean(key) &&
-    key !== 'placeholder-anon-key' &&
-    key !== 'your-public-anon-key-here'
+    Boolean(supabaseUrl) &&
+    supabaseUrl !== 'https://placeholder.supabase.co' &&
+    supabaseUrl !== 'https://your-project.supabase.co' &&
+    Boolean(supabaseAnonKey) &&
+    supabaseAnonKey !== 'placeholder-anon-key' &&
+    supabaseAnonKey !== 'your-public-anon-key-here'
   );
 };
 
