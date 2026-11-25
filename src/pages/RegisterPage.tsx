@@ -95,12 +95,41 @@ export const RegisterPage: React.FC = () => {
   const [accommodationParticipantsCount, setAccommodationParticipantsCount] = useState<number>(1);
 
   // Meal Requirements State
+  const [mealsRequired, setMealsRequired] = useState(false);
   const [breakfastRequired, setBreakfastRequired] = useState(false);
   const [breakfastDays, setBreakfastDays] = useState(1);
   const [lunchRequired, setLunchRequired] = useState(false);
   const [lunchDays, setLunchDays] = useState(1);
   const [dinnerRequired, setDinnerRequired] = useState(false);
   const [dinnerDays, setDinnerDays] = useState(1);
+
+  const handleMealsToggle = (needed: boolean) => {
+    setMealsRequired(needed);
+    if (needed) {
+      setBreakfastRequired(true);
+      setLunchRequired(true);
+      setDinnerRequired(true);
+      setBreakfastDays(effectiveStayDays > 0 ? effectiveStayDays : 1);
+      setLunchDays(effectiveStayDays > 0 ? effectiveStayDays : 1);
+      setDinnerDays(effectiveStayDays > 0 ? effectiveStayDays : 1);
+    } else {
+      setBreakfastRequired(false);
+      setLunchRequired(false);
+      setDinnerRequired(false);
+    }
+  };
+
+  const handleIndividualMealToggle = (meal: 'breakfast' | 'lunch' | 'dinner', needed: boolean) => {
+    if (meal === 'breakfast') setBreakfastRequired(needed);
+    if (meal === 'lunch') setLunchRequired(needed);
+    if (meal === 'dinner') setDinnerRequired(needed);
+
+    const willHaveBreakfast = meal === 'breakfast' ? needed : breakfastRequired;
+    const willHaveLunch = meal === 'lunch' ? needed : lunchRequired;
+    const willHaveDinner = meal === 'dinner' ? needed : dinnerRequired;
+
+    setMealsRequired(willHaveBreakfast || willHaveLunch || willHaveDinner);
+  };
 
   // Submission & Duplicate states
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -728,24 +757,101 @@ export const RegisterPage: React.FC = () => {
 
             {/* Section 2: Accommodation Requirement & Pricing */}
             <div className="pt-6 border-t border-[#00F5B8]/15 space-y-4">
+              <div>
+                <h3 className="text-base font-bold text-[#F0FDF9] flex items-center gap-2 font-heading tracking-tight">
+                  <BedDouble className="w-4 h-4 text-[#00F5B8]" />
+                  <span>Accommodation Requirement</span>
+                </h3>
+                <p className="text-xs text-[#9FB9C1] mt-0.5">
+                  Tariff: ₹200 per person per day. Please verify your stay dates and number of participants.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-xl bg-[#061419]/70 border border-[#00F5B8]/20 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Stay Dates */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-medium text-[#F0FDF9]">
+                      Check-in Date *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      min={today}
+                      value={checkInDate}
+                      onChange={(e) => setCheckInDate(e.target.value)}
+                      className="w-full h-10 px-3 rounded-lg border border-[#00F5B8]/20 bg-[#051117] text-[#F0FDF9] text-xs"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-medium text-[#F0FDF9]">
+                      Check-out Date *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      min={checkInDate || today}
+                      value={checkOutDate}
+                      onChange={(e) => setCheckOutDate(e.target.value)}
+                      className="w-full h-10 px-3 rounded-lg border border-[#00F5B8]/20 bg-[#051117] text-[#F0FDF9] text-xs"
+                    />
+                  </div>
+
+                  {/* Calculated Days */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-medium text-[#F0FDF9]">
+                      Accommodation Days
+                    </label>
+                    <div className="w-full h-10 px-3 rounded-lg border border-[#00F5B8]/20 bg-[#051117] text-[#00F5B8] text-xs font-mono font-bold flex items-center justify-between">
+                      <span>{effectiveStayDays} {effectiveStayDays === 1 ? 'day' : 'days'}</span>
+                      <span className="text-[10px] text-[#5A7E88]">₹200/day/person</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Accommodation Participants count if Team Mode */}
+                {isTeamMode && (
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-medium text-[#F0FDF9]">
+                      Number of participants requiring accommodation *
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max={totalMembersCount}
+                      value={accommodationParticipantsCount}
+                      onChange={(e) => setAccommodationParticipantsCount(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                      className="w-full sm:w-48 h-10 px-3 rounded-lg border border-[#00F5B8]/20 bg-[#051117] text-[#F0FDF9] text-xs font-mono"
+                    />
+                    <p className="text-[11px] text-[#5A7E88]">
+                      Max {totalMembersCount} team members. You can adjust this if only some members require hostel stay.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Section 3: Meal Requirements */}
+            <div className="pt-6 border-t border-[#00F5B8]/15 space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h3 className="text-base font-bold text-[#F0FDF9] flex items-center gap-2 font-heading tracking-tight">
-                    <BedDouble className="w-4 h-4 text-[#00F5B8]" />
-                    <span>Accommodation Requirement</span>
+                    <Utensils className="w-4 h-4 text-[#00F5B8]" />
+                    <span>Meal Requirements</span>
                   </h3>
                   <p className="text-xs text-[#9FB9C1] mt-0.5">
-                    Tariff: ₹200 per person per day.
+                    Breakfast: ₹50 | Lunch: ₹60 | Dinner: ₹60 per person per meal.
                   </p>
                 </div>
 
-                {/* Yes/No Toggle */}
+                {/* Yes/No Toggle for Meals */}
                 <div className="flex items-center gap-2 p-1 rounded-lg bg-[#040E12] border border-[#00F5B8]/20">
                   <button
                     type="button"
-                    onClick={() => setAccommodationRequired(true)}
+                    onClick={() => handleMealsToggle(true)}
                     className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                      accommodationRequired
+                      mealsRequired
                         ? 'bg-[#00F5B8] text-[#021713] shadow-[0_0_12px_rgba(0,245,184,0.3)]'
                         : 'text-[#9FB9C1] hover:text-[#F0FDF9]'
                     }`}
@@ -754,9 +860,9 @@ export const RegisterPage: React.FC = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setAccommodationRequired(false)}
+                    onClick={() => handleMealsToggle(false)}
                     className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                      !accommodationRequired
+                      !mealsRequired
                         ? 'bg-[#F87171] text-white shadow-[0_0_12px_rgba(248,113,113,0.3)]'
                         : 'text-[#9FB9C1] hover:text-[#F0FDF9]'
                     }`}
@@ -766,192 +872,175 @@ export const RegisterPage: React.FC = () => {
                 </div>
               </div>
 
-              {accommodationRequired && (
+              {!mealsRequired ? (
+                <div className="p-4 rounded-xl bg-[#061419]/50 border border-[#00F5B8]/15 text-center text-xs text-[#9FB9C1]">
+                  <span>Meals are currently set to <strong className="text-[#F87171]">Not Required</strong> (₹0 meal charges). Click &quot;Yes, Needed&quot; above to include breakfast, lunch, or dinner.</span>
+                </div>
+              ) : (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="p-5 rounded-xl bg-[#061419]/70 border border-[#00F5B8]/20 space-y-4"
+                  className="space-y-4"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {/* Stay Dates */}
-                    <div className="space-y-1.5">
-                      <label className="block text-xs font-medium text-[#F0FDF9]">
-                        Check-in Date *
-                      </label>
-                      <input
-                        type="date"
-                        required={accommodationRequired}
-                        min={today}
-                        value={checkInDate}
-                        onChange={(e) => setCheckInDate(e.target.value)}
-                        className="w-full h-10 px-3 rounded-lg border border-[#00F5B8]/20 bg-[#051117] text-[#F0FDF9] text-xs"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="block text-xs font-medium text-[#F0FDF9]">
-                        Check-out Date *
-                      </label>
-                      <input
-                        type="date"
-                        required={accommodationRequired}
-                        min={checkInDate || today}
-                        value={checkOutDate}
-                        onChange={(e) => setCheckOutDate(e.target.value)}
-                        className="w-full h-10 px-3 rounded-lg border border-[#00F5B8]/20 bg-[#051117] text-[#F0FDF9] text-xs"
-                      />
-                    </div>
-
-                    {/* Calculated Days */}
-                    <div className="space-y-1.5">
-                      <label className="block text-xs font-medium text-[#F0FDF9]">
-                        Accommodation Days
-                      </label>
-                      <div className="w-full h-10 px-3 rounded-lg border border-[#00F5B8]/20 bg-[#051117] text-[#00F5B8] text-xs font-mono font-bold flex items-center justify-between">
-                        <span>{effectiveStayDays} {effectiveStayDays === 1 ? 'day' : 'days'}</span>
-                        <span className="text-[10px] text-[#5A7E88]">₹200/day/person</span>
+                    {/* Breakfast */}
+                    <div className={`p-4 rounded-xl border transition-all ${
+                      breakfastRequired
+                        ? 'bg-[#00F5B8]/10 border-[#00F5B8]/50 shadow-[0_0_16px_rgba(0,245,184,0.15)]'
+                        : 'bg-[#061419]/70 border-[#00F5B8]/20 opacity-70'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-sm font-bold text-[#F0FDF9] block">Breakfast</span>
+                          <span className="text-xs text-[#00F5B8] font-mono font-semibold">₹50 per meal</span>
+                        </div>
+                        <div className="flex items-center gap-1 p-0.5 rounded-md bg-[#040E12] border border-[#00F5B8]/20 text-[10px]">
+                          <button
+                            type="button"
+                            onClick={() => handleIndividualMealToggle('breakfast', true)}
+                            className={`px-2 py-0.5 rounded font-semibold transition-all ${
+                              breakfastRequired
+                                ? 'bg-[#00F5B8] text-[#021713]'
+                                : 'text-[#9FB9C1] hover:text-[#F0FDF9]'
+                            }`}
+                          >
+                            Needed
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleIndividualMealToggle('breakfast', false)}
+                            className={`px-2 py-0.5 rounded font-semibold transition-all ${
+                              !breakfastRequired
+                                ? 'bg-[#F87171] text-white'
+                                : 'text-[#9FB9C1] hover:text-[#F0FDF9]'
+                            }`}
+                          >
+                            Skip
+                          </button>
+                        </div>
                       </div>
+
+                      {breakfastRequired && (
+                        <div className="mt-3 pt-3 border-t border-[#00F5B8]/15 space-y-1">
+                          <label className="block text-[11px] text-[#9FB9C1]">Number of breakfast meals / days:</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="30"
+                            value={breakfastDays}
+                            onChange={(e) => setBreakfastDays(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                            className="w-full h-8 px-2 rounded border border-[#00F5B8]/30 bg-[#051117] text-xs font-mono text-[#F0FDF9]"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Lunch */}
+                    <div className={`p-4 rounded-xl border transition-all ${
+                      lunchRequired
+                        ? 'bg-[#00F5B8]/10 border-[#00F5B8]/50 shadow-[0_0_16px_rgba(0,245,184,0.15)]'
+                        : 'bg-[#061419]/70 border-[#00F5B8]/20 opacity-70'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-sm font-bold text-[#F0FDF9] block">Lunch</span>
+                          <span className="text-xs text-[#00F5B8] font-mono font-semibold">₹60 per meal</span>
+                        </div>
+                        <div className="flex items-center gap-1 p-0.5 rounded-md bg-[#040E12] border border-[#00F5B8]/20 text-[10px]">
+                          <button
+                            type="button"
+                            onClick={() => handleIndividualMealToggle('lunch', true)}
+                            className={`px-2 py-0.5 rounded font-semibold transition-all ${
+                              lunchRequired
+                                ? 'bg-[#00F5B8] text-[#021713]'
+                                : 'text-[#9FB9C1] hover:text-[#F0FDF9]'
+                            }`}
+                          >
+                            Needed
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleIndividualMealToggle('lunch', false)}
+                            className={`px-2 py-0.5 rounded font-semibold transition-all ${
+                              !lunchRequired
+                                ? 'bg-[#F87171] text-white'
+                                : 'text-[#9FB9C1] hover:text-[#F0FDF9]'
+                            }`}
+                          >
+                            Skip
+                          </button>
+                        </div>
+                      </div>
+
+                      {lunchRequired && (
+                        <div className="mt-3 pt-3 border-t border-[#00F5B8]/15 space-y-1">
+                          <label className="block text-[11px] text-[#9FB9C1]">Number of lunch meals / days:</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="30"
+                            value={lunchDays}
+                            onChange={(e) => setLunchDays(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                            className="w-full h-8 px-2 rounded border border-[#00F5B8]/30 bg-[#051117] text-xs font-mono text-[#F0FDF9]"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Dinner */}
+                    <div className={`p-4 rounded-xl border transition-all ${
+                      dinnerRequired
+                        ? 'bg-[#00F5B8]/10 border-[#00F5B8]/50 shadow-[0_0_16px_rgba(0,245,184,0.15)]'
+                        : 'bg-[#061419]/70 border-[#00F5B8]/20 opacity-70'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-sm font-bold text-[#F0FDF9] block">Dinner</span>
+                          <span className="text-xs text-[#00F5B8] font-mono font-semibold">₹60 per meal</span>
+                        </div>
+                        <div className="flex items-center gap-1 p-0.5 rounded-md bg-[#040E12] border border-[#00F5B8]/20 text-[10px]">
+                          <button
+                            type="button"
+                            onClick={() => handleIndividualMealToggle('dinner', true)}
+                            className={`px-2 py-0.5 rounded font-semibold transition-all ${
+                              dinnerRequired
+                                ? 'bg-[#00F5B8] text-[#021713]'
+                                : 'text-[#9FB9C1] hover:text-[#F0FDF9]'
+                            }`}
+                          >
+                            Needed
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleIndividualMealToggle('dinner', false)}
+                            className={`px-2 py-0.5 rounded font-semibold transition-all ${
+                              !dinnerRequired
+                                ? 'bg-[#F87171] text-white'
+                                : 'text-[#9FB9C1] hover:text-[#F0FDF9]'
+                            }`}
+                          >
+                            Skip
+                          </button>
+                        </div>
+                      </div>
+
+                      {dinnerRequired && (
+                        <div className="mt-3 pt-3 border-t border-[#00F5B8]/15 space-y-1">
+                          <label className="block text-[11px] text-[#9FB9C1]">Number of dinner meals / days:</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="30"
+                            value={dinnerDays}
+                            onChange={(e) => setDinnerDays(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                            className="w-full h-8 px-2 rounded border border-[#00F5B8]/30 bg-[#051117] text-xs font-mono text-[#F0FDF9]"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {/* Accommodation Participants count if Team Mode */}
-                  {isTeamMode && (
-                    <div className="space-y-1.5">
-                      <label className="block text-xs font-medium text-[#F0FDF9]">
-                        Number of participants requiring accommodation *
-                      </label>
-                      <input
-                        type="number"
-                        min="1"
-                        max={totalMembersCount}
-                        value={accommodationParticipantsCount}
-                        onChange={(e) => setAccommodationParticipantsCount(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                        className="w-full sm:w-48 h-10 px-3 rounded-lg border border-[#00F5B8]/20 bg-[#051117] text-[#F0FDF9] text-xs font-mono"
-                      />
-                      <p className="text-[11px] text-[#5A7E88]">
-                        Max {totalMembersCount} team members. You can adjust this if only some members require hostel stay.
-                      </p>
-                    </div>
-                  )}
                 </motion.div>
               )}
-            </div>
-
-            {/* Section 3: Meal Requirements */}
-            <div className="pt-6 border-t border-[#00F5B8]/15 space-y-4">
-              <div>
-                <h3 className="text-base font-bold text-[#F0FDF9] flex items-center gap-2 font-heading tracking-tight">
-                  <Utensils className="w-4 h-4 text-[#00F5B8]" />
-                  <span>Meal Requirements</span>
-                </h3>
-                <p className="text-xs text-[#9FB9C1] mt-0.5">
-                  Select required meals and indicate quantities or days. Do not assume all participants need every meal.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Breakfast */}
-                <div className={`p-4 rounded-xl border transition-all ${
-                  breakfastRequired
-                    ? 'bg-[#00F5B8]/10 border-[#00F5B8]/50 shadow-[0_0_16px_rgba(0,245,184,0.15)]'
-                    : 'bg-[#061419]/70 border-[#00F5B8]/20'
-                }`}>
-                  <label className="flex items-center gap-2.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={breakfastRequired}
-                      onChange={(e) => setBreakfastRequired(e.target.checked)}
-                      className="w-4 h-4 rounded text-[#00F5B8] focus:ring-[#00F5B8]"
-                    />
-                    <div>
-                      <span className="text-sm font-bold text-[#F0FDF9] block">Breakfast</span>
-                      <span className="text-xs text-[#00F5B8] font-mono font-semibold">₹50 per meal</span>
-                    </div>
-                  </label>
-
-                  {breakfastRequired && (
-                    <div className="mt-3 pt-3 border-t border-[#00F5B8]/15 space-y-1">
-                      <label className="block text-[11px] text-[#9FB9C1]">Number of breakfast meals / days:</label>
-                      <input
-                        type="number"
-                        min="1"
-                        max="30"
-                        value={breakfastDays}
-                        onChange={(e) => setBreakfastDays(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                        className="w-full h-8 px-2 rounded border border-[#00F5B8]/30 bg-[#051117] text-xs font-mono text-[#F0FDF9]"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Lunch */}
-                <div className={`p-4 rounded-xl border transition-all ${
-                  lunchRequired
-                    ? 'bg-[#00F5B8]/10 border-[#00F5B8]/50 shadow-[0_0_16px_rgba(0,245,184,0.15)]'
-                    : 'bg-[#061419]/70 border-[#00F5B8]/20'
-                }`}>
-                  <label className="flex items-center gap-2.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={lunchRequired}
-                      onChange={(e) => setLunchRequired(e.target.checked)}
-                      className="w-4 h-4 rounded text-[#00F5B8] focus:ring-[#00F5B8]"
-                    />
-                    <div>
-                      <span className="text-sm font-bold text-[#F0FDF9] block">Lunch</span>
-                      <span className="text-xs text-[#00F5B8] font-mono font-semibold">₹60 per meal</span>
-                    </div>
-                  </label>
-
-                  {lunchRequired && (
-                    <div className="mt-3 pt-3 border-t border-[#00F5B8]/15 space-y-1">
-                      <label className="block text-[11px] text-[#9FB9C1]">Number of lunch meals / days:</label>
-                      <input
-                        type="number"
-                        min="1"
-                        max="30"
-                        value={lunchDays}
-                        onChange={(e) => setLunchDays(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                        className="w-full h-8 px-2 rounded border border-[#00F5B8]/30 bg-[#051117] text-xs font-mono text-[#F0FDF9]"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Dinner */}
-                <div className={`p-4 rounded-xl border transition-all ${
-                  dinnerRequired
-                    ? 'bg-[#00F5B8]/10 border-[#00F5B8]/50 shadow-[0_0_16px_rgba(0,245,184,0.15)]'
-                    : 'bg-[#061419]/70 border-[#00F5B8]/20'
-                }`}>
-                  <label className="flex items-center gap-2.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={dinnerRequired}
-                      onChange={(e) => setDinnerRequired(e.target.checked)}
-                      className="w-4 h-4 rounded text-[#00F5B8] focus:ring-[#00F5B8]"
-                    />
-                    <div>
-                      <span className="text-sm font-bold text-[#F0FDF9] block">Dinner</span>
-                      <span className="text-xs text-[#00F5B8] font-mono font-semibold">₹60 per meal</span>
-                    </div>
-                  </label>
-
-                  {dinnerRequired && (
-                    <div className="mt-3 pt-3 border-t border-[#00F5B8]/15 space-y-1">
-                      <label className="block text-[11px] text-[#9FB9C1]">Number of dinner meals / days:</label>
-                      <input
-                        type="number"
-                        min="1"
-                        max="30"
-                        value={dinnerDays}
-                        onChange={(e) => setDinnerDays(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                        className="w-full h-8 px-2 rounded border border-[#00F5B8]/30 bg-[#051117] text-xs font-mono text-[#F0FDF9]"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
 
             {/* LIVE ESTIMATED ORDER SUMMARY (Sections 4 & 5) */}
