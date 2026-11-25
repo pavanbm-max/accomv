@@ -179,6 +179,12 @@ export async function createPreRegistration(
 
   let registrationRecordId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11);
 
+  // Pre-calculate meal counts
+  const mealParticipants = Math.max(1, payload.accommodationParticipants || (payload.teamMembers?.length ? payload.teamMembers.length + 1 : 1));
+  const breakfastQty = payload.meals.breakfast ? mealParticipants * payload.meals.breakfastDays : 0;
+  const lunchQty = payload.meals.lunch ? mealParticipants * payload.meals.lunchDays : 0;
+  const dinnerQty = payload.meals.dinner ? mealParticipants * payload.meals.dinnerDays : 0;
+
   if (isSupabaseConfigured()) {
     try {
       // 1. Insert into registrations
@@ -216,10 +222,6 @@ export async function createPreRegistration(
       }
 
       // 2. Insert into meal_requirements if meals are required
-      const breakfastQty = payload.meals.breakfast ? payload.accommodationParticipants * payload.meals.breakfastDays : 0;
-      const lunchQty = payload.meals.lunch ? payload.accommodationParticipants * payload.meals.lunchDays : 0;
-      const dinnerQty = payload.meals.dinner ? payload.accommodationParticipants * payload.meals.dinnerDays : 0;
-
       if (breakfastQty > 0 || lunchQty > 0 || dinnerQty > 0) {
         const { error: mealInsertErr } = await supabase.from('meal_requirements').insert({
           registration_id: registrationRecordId,
@@ -270,9 +272,9 @@ export async function createPreRegistration(
     team_members: payload.teamMembers || [],
     created_at: new Date().toISOString(),
     meal_requirements: {
-      breakfast_quantity: payload.meals.breakfast ? payload.accommodationParticipants * payload.meals.breakfastDays : 0,
-      lunch_quantity: payload.meals.lunch ? payload.accommodationParticipants * payload.meals.lunchDays : 0,
-      dinner_quantity: payload.meals.dinner ? payload.accommodationParticipants * payload.meals.dinnerDays : 0,
+      breakfast_quantity: breakfastQty,
+      lunch_quantity: lunchQty,
+      dinner_quantity: dinnerQty,
       breakfast_amount: costs.breakfastAmount,
       lunch_amount: costs.lunchAmount,
       dinner_amount: costs.dinnerAmount,
