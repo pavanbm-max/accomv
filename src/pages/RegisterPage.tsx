@@ -81,7 +81,7 @@ export const RegisterPage: React.FC = () => {
   const [college, setCollege] = useState('');
   const [department, setDepartment] = useState('');
   const [academicYear, setAcademicYear] = useState(ACADEMIC_YEARS[2]);
-  const [eventCategory, setEventCategory] = useState(EVENT_CATEGORIES[0]);
+  const [eventCategory, setEventCategory] = useState('');
   const [emergencyContact, setEmergencyContact] = useState('');
 
   // Teammates State
@@ -235,6 +235,11 @@ export const RegisterPage: React.FC = () => {
 
     if (!department.trim()) {
       toastError('Please enter your academic department.');
+      return;
+    }
+
+    if (!eventCategory.trim()) {
+      toastError('Please enter your event / participation category.');
       return;
     }
 
@@ -610,15 +615,20 @@ export const RegisterPage: React.FC = () => {
                 <label className="block text-[13px] font-medium text-[#F0FDF9]">
                   Event / Participation Category *
                 </label>
-                <select
+                <input
+                  type="text"
+                  required
+                  list="event-categories-list"
                   value={eventCategory}
                   onChange={(e) => setEventCategory(e.target.value)}
-                  className="w-full h-11 px-3.5 rounded-lg border border-[#00F5B8]/20 bg-[#051117]/85 text-[#F0FDF9] focus:border-[#00F5B8] focus:ring-2 focus:ring-[#00F5B8]/30 text-sm transition-all duration-200"
-                >
+                  placeholder="e.g. Technical Paper Presentation, Hackathon, RoboWars, Cultural"
+                  className="w-full h-11 px-3.5 rounded-lg border border-[#00F5B8]/20 bg-[#051117]/85 text-[#F0FDF9] placeholder:text-[#5A7E88] focus:border-[#00F5B8] focus:ring-2 focus:ring-[#00F5B8]/30 text-sm transition-all duration-200"
+                />
+                <datalist id="event-categories-list">
                   {EVENT_CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
+                    <option key={cat} value={cat} />
                   ))}
-                </select>
+                </datalist>
               </div>
 
               {/* Emergency Contact */}
